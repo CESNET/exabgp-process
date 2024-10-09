@@ -11,32 +11,22 @@ import sys
 import os
 from time import sleep
 
-import config
-import exa_api_logger
 
-logger = exa_api_logger.create()
+def api(user, passwd, queue, host, port, vhost, logger):
 
+    def callback(ch, method, properties, body):
+        body = body.decode("utf-8")
+        logger.info(body)
+        sys.stdout.write("%s\n" % body)
+        sys.stdout.flush()
 
-def callback(ch, method, properties, body):
-    body = body.decode("utf-8")
-    logger.info(body)
-    sys.stdout.write("%s\n" % body)
-    sys.stdout.flush()
-
-
-def main():
-
-    print(" [*] Connecting to RabbitMQ")
     while True:
-        user = config.EXA_API_RABBIT_USER
-        passwd = config.EXA_API_RABBIT_PASS
-        queue = config.EXA_API_RABBIT_QUEUE
         credentials = pika.PlainCredentials(user, passwd)
 
         parameters = pika.ConnectionParameters(
-            config.EXA_API_RABBIT_HOST,
-            config.EXA_API_RABBIT_PORT,
-            config.EXA_API_RABBIT_VHOST,
+            host,
+            port,
+            vhost,
             credentials,
         )
 
@@ -47,7 +37,6 @@ def main():
 
         channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
 
-        print(" [*] Waiting for messages. To exit press CTRL+C")
         try:
             channel.start_consuming()
         except KeyboardInterrupt:
@@ -61,7 +50,3 @@ def main():
         except pika.exceptions.ConnectionClosedByBroker:
             sleep(15)
             continue
-
-
-if __name__ == "__main__":
-    main()
