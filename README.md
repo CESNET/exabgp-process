@@ -11,14 +11,14 @@ pip install exabgp_api
 Generate and setup the config file and then copy the config to /etc/exabgp/api.conf.
 Setup log dir and file in the config and make sure, that dir exists and its writable for ExaBGP process.
 ```
-exabgp-api --generate-config >> api.conf
-mv api.conf /etc/exabgp/api.conf
+exabgp-process --generate-config >> process.conf
+mv process.conf /etc/exabgp/process.conf
 ```
 
 Add this to your ExaBGP config
 ```
 process flowspec {
-         run /usr/local/exabgp-api;
+         run /usr/local/exabgp-process;
          encoder json;
     }
 ```
