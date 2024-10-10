@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="exabgp_api",
-    version="0.1.0",
-    description="API for ExaBGP, started by ExaBGP process",
+    name="exabgp_process",
+    version="1.0.0",
+    description="Process for ExaBGP, started by ExaBGP service",
     author="Jiri Vrany",
     author_email="jiri.vrany@cesnet.cz",
     packages=find_packages(),
@@ -11,7 +11,7 @@ setup(
     python_requires=">=3.7",
     entry_points={
         "console_scripts": [
-            "exabgp-api=exabgp_api:main",
+            "exabgp-process=exabgp_process:main",
         ],
     },
 )

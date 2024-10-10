@@ -2,8 +2,8 @@ import os
 import configparser
 from loguru import logger
 import click
-import exabgp_api.rabbit as rabbit
-import exabgp_api.http as http
+import exabgp_process.rabbit as rabbit
+import exabgp_process.http as http
 
 
 def generate_config_template():
@@ -35,9 +35,10 @@ def load_config():
     config = configparser.ConfigParser()
     locations = [
         "api.conf",
-        "/etc/exabgp_api/api.conf",
-        "/etc/exabgp/api.conf",
-        "/usr/local/etc/exabgp_api/api.conf",
+        "process.conf",
+        "/etc/exabgp_process/process.conf",
+        "/etc/exabgp/process.conf",
+        "/usr/local/etc/exabgp_process/process.conf",
     ]
     config.read(filenames=locations)  # Ensure this is in the correct location
     return config
@@ -47,20 +48,20 @@ def load_config():
 @click.option("--generate-config", is_flag=True, help="Generate a configuration file")
 def main(generate_config):
     """
-    ExaBGP HTTP API process
+    ExaBGP process
     This module is process for ExaBGP
     https://github.com/Exa-Networks/exabgp/wiki/Controlling-ExaBGP-:-possible-options-for-process
 
-    Each command received by API listener is send to stdout and captured by ExaBGP.
-    API can be RabbitMQ (preffered) or HTTP. API type is defined in configuration file.
+    Each command received by this listener is send to stdout and captured by ExaBGP.
+    The process is either RabbitMQ (preffered) or HTTP. API type is defined in configuration file.
     """
     if generate_config:
         print(generate_config_template())
         return
     # Load configuration
     config = load_config()
-    log_dir = config.get("logging", "log_dir", fallback="/var/log/exabgp_api")
-    log_file = config.get("logging", "log_file", fallback="exabgp_api.log")
+    log_dir = config.get("logging", "log_dir", fallback="/var/log/exabgp")
+    log_file = config.get("logging", "log_file", fallback="exabgp_process.log")
     logger.remove()
     logger.add(os.path.join(log_dir, log_file), rotation="1 week")
 
