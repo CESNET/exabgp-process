@@ -9,6 +9,7 @@ Each command received from the queue is send to stdout and captured by ExaBGP.
 import pika
 import sys
 import os
+import json
 from time import sleep
 
 
@@ -16,8 +17,9 @@ def api(user, passwd, queue, host, port, vhost, logger):
 
     def callback(ch, method, properties, body):
         body = body.decode("utf-8")
+        route = json.loads(body)
         logger.info(body)
-        sys.stdout.write("%s\n" % body)
+        sys.stdout.write("%s\n" % route["command"])
         sys.stdout.flush()
 
     while True:

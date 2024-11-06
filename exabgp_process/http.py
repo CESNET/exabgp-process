@@ -1,3 +1,4 @@
+import json
 from flask import Flask, request
 from sys import stdout
 
@@ -9,8 +10,9 @@ app.logger = None
 @app.route("/", methods=["POST"])
 def command():
     cmd = request.form["command"]
+    route = json.loads(cmd)
     app.logger.info(cmd)
-    stdout.write("%s\n" % cmd)
+    stdout.write("%s\n" % route["command"])
     stdout.flush()
 
     return "%s\n" % cmd
