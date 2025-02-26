@@ -5,7 +5,7 @@ This application is a simple API that interfaces with the [ExaBGP service](https
 Each time this app receives a new command, it forwards the command to ExaBGP via stdout. The registered ExaBGP service monitors the stdout of this API application.
 
 ### Installation
-You can install the package using pip:
+You can install the [package using pip](https://pypi.org/project/exabgp-process/):
 ```
 pip install exabgp_process
 ```
@@ -35,6 +35,6 @@ For more information, refer to the [ExaBGP documentation](https://github.com/Exa
 
 
 ### Changelog
-1.0.4 - fixed template for config file
-1.0.3 - new format of message from server - json with keys: author, source, command. Author and source are for logging purposes, command is send to the process.
-1.0.2 - switch to pyproject.toml for better description
+- 1.0.4 - fixed template for config file
+- 1.0.3 - new format of message from server - json with keys: author, source, command. Author and source are for logging purposes, command is send to the process.
+- 1.0.2 - switch to pyproject.toml for better description
