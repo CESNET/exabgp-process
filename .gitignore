@@ -1,6 +1,7 @@
 config.py
 run.py
 *.conf
+.vault
 
 # PyCharm
 .idea/
