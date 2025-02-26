@@ -1,4 +1,3 @@
-
 # ExaBGP Process Package
 
 This application is a simple API that interfaces with the [ExaBGP service](https://github.com/Exa-Networks/exabgp/tree/main).
@@ -36,6 +35,6 @@ For more information, refer to the [ExaBGP documentation](https://github.com/Exa
 
 
 ### Changelog
-
+1.0.4 - fixed template for config file
 1.0.3 - new format of message from server - json with keys: author, source, command. Author and source are for logging purposes, command is send to the process.
 1.0.2 - switch to pyproject.toml for better description

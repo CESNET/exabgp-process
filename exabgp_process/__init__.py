@@ -6,27 +6,39 @@ import exabgp_process.rabbit as rabbit
 import exabgp_process.http as http
 
 
+# @TODO move comments to extra lines
 def generate_config_template():
     template = """
 [api]
 type = rabbitmq
 
 [logging]
-log_dir = /var/log/myapp    # Path where logs will be stored
-log_file = myapp.log        # Log file name
-log_format = %(asctime)s:  %(message)s    # Log format
+# Path where logs will be stored
+log_dir = /var/log/myapp
+# Log file name
+log_file = myapp.log
+# Log format
+log_format = %(asctime)s:  %(message)s
 
 [rabbitmq]
-host = localhost            # RabbitMQ host address
-port = 5672                 # RabbitMQ port
-user = apiuser              # RabbitMQ user
-password = securepassword   # RabbitMQ password
-vhost = /                   # RabbitMQ virtual host
-queue = apiqueue            # RabbitMQ queue name
+# RabbitMQ host address
+host = localhost
+# RabbitMQ port
+port = 5672
+# RabbitMQ user
+user = apiuser
+# RabbitMQ password
+password = securepassword
+# RabbitMQ vhost
+vhost = /
+# RabbitMQ queue name
+queue = apiqueue
 
 [http]
-host = localhost            # HTTP API host address
-port = 5000                 # HTTP API port
+# HTTP API host address
+host = 0.0.0.0
+# HTTP API port
+port = 5000
     """
     return template
 
