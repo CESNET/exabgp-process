@@ -8,7 +8,7 @@ Each command received from the queue is send to stdout and captured by ExaBGP.
 """
 import pika
 import sys
-import os
+import signal
 import json
 from time import sleep
 
@@ -16,11 +16,29 @@ from time import sleep
 def api(user, passwd, queue, host, port, vhost, logger):
 
     def callback(ch, method, properties, body):
-        body = body.decode("utf-8")
-        route = json.loads(body)
-        logger.info(body)
-        sys.stdout.write("%s\n" % route["command"])
-        sys.stdout.flush()
+        try:
+            body = body.decode("utf-8")
+            route = json.loads(body)
+            command = route["command"]
+            logger.info(body)
+            sys.stdout.write("%s\n" % command)
+            sys.stdout.flush()
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+        except (json.JSONDecodeError, KeyError, UnicodeDecodeError) as e:
+            logger.error("Malformed message rejected: {} - {}", type(e).__name__, e)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        except Exception as e:
+            logger.error("Unexpected error processing message: {} - {}", type(e).__name__, e)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
+
+    def shutdown(connection, channel):
+        logger.info("Shutting down gracefully")
+        try:
+            channel.stop_consuming()
+            connection.close()
+        except Exception:
+            pass
+        sys.exit(0)
 
     while True:
         credentials = pika.PlainCredentials(user, passwd)
@@ -32,23 +50,30 @@ def api(user, passwd, queue, host, port, vhost, logger):
             credentials,
         )
 
-        connection = pika.BlockingConnection(parameters)
+        try:
+            connection = pika.BlockingConnection(parameters)
+        except pika.exceptions.AMQPConnectionError:
+            logger.warning("RabbitMQ unavailable, retrying in 15 seconds")
+            sleep(15)
+            continue
+
         channel = connection.channel()
 
         channel.queue_declare(queue=queue)
 
-        channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
+        signal.signal(signal.SIGTERM, lambda sig, frame: shutdown(connection, channel))
+
+        channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=False)
 
         try:
             channel.start_consuming()
         except KeyboardInterrupt:
-            channel.stop_consuming()
-            connection.close()
-            print("\n[*] Interrupted - exiting")
-            try:
-                sys.exit(0)
-            except SystemExit:
-                os._exit(0)
+            shutdown(connection, channel)
+        except pika.exceptions.AMQPConnectionError:
+            logger.warning("RabbitMQ connection lost, retrying in 15 seconds")
+            sleep(15)
+            continue
         except pika.exceptions.ConnectionClosedByBroker:
+            logger.warning("Connection closed by broker, retrying in 15 seconds")
             sleep(15)
             continue
